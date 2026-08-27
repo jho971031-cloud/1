@@ -1,35 +1,197 @@
-<!doctype html><html lang="ko"><head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#090d12"><link rel="manifest" href="/manifest.json"><title>🐋 Whale 13F</title>
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#090d12">
+<title>Whale 13F</title>
 <style>
-*{box-sizing:border-box}body{margin:0;background:#090d12;color:#eef2f7;font-family:-apple-system,BlinkMacSystemFont,"Noto Sans KR",sans-serif}
-header{height:58px;padding:0 15px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #202832}.logo{font-size:19px;font-weight:900}.g{color:#39d49f}.gold{color:#f3c95b}.muted{color:#778594;font-size:11px}
-main{max-width:1000px;margin:auto;padding:12px 12px 75px}.tabs{display:flex;gap:7px;overflow:auto;margin-bottom:10px}.tabs button{border:0;background:#131a22;color:#aab5c1;padding:9px 14px;border-radius:7px}.tabs .on{background:#24302c;color:#fff}
-.card{background:#0f151c;border:1px solid #202832;border-radius:13px;padding:12px;margin-bottom:12px}.ticker{font-weight:900}.name{font-size:11px;color:#778594}.quote{display:flex;gap:10px;align-items:end}.price{font-size:30px;font-weight:900}
-.chart{height:500px;margin-top:10px;border-radius:9px;overflow:hidden;background:#0b1117}.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.h{font-size:14px;font-weight:850;margin-bottom:9px}.row{display:flex;justify-content:space-between;gap:7px;padding:9px 0;border-bottom:1px solid #202832;font-size:12px}.row:last-child{border:0}.stars{color:#f3c95b;font-size:16px}
-.bottom{position:fixed;bottom:0;left:0;right:0;height:60px;background:#10161cf2;border-top:1px solid #202832;display:flex;justify-content:space-around}.bottom button{border:0;background:none;color:#758392;font-size:10px}.bottom b{display:block;color:#eef2f7;font-size:17px}
-@media(max-width:650px){.grid{grid-template-columns:1fr}.chart{height:430px}}
-</style></head><body>
-<header><div class="logo">🐋 Whale <span class="g">13F</span></div><div class="g">● LIVE CHART</div></header>
-<main><div id="tabs" class="tabs"></div>
-<section class="card"><div class="ticker" id="ticker">AMZN</div><div class="name" id="name">Amazon</div>
-<div class="quote"><div class="price">TradingView</div><div class="g">실시간 차트</div></div>
-<div class="chart" id="tvchart"></div>
-<div class="muted">TradingView 차트 데이터 기준. 거래소/계정 권한에 따라 실시간 또는 지연 데이터일 수 있습니다.</div></section>
-<div class="grid"><section class="card"><div class="h">🐋 거장 신호</div><div id="signals"></div></section>
-<section class="card"><div class="h">🎯 Whale Score</div><div id="score"></div></section></div>
-<section class="card"><div class="h">🔥 관심종목 TOP 5</div><div id="top"></div></section>
-<section class="card"><div class="h">📡 SEC 최근 13F</div><div id="sec">불러오는 중…</div></section>
-</main><nav class="bottom"><button>⌂<br>홈</button><button>🐋<br>거장</button><button>★<br>관심</button><button>⚙<br>설정</button></nav>
+:root{--bg:#090d12;--card:#101720;--line:#202a35;--text:#edf2f7;--muted:#7d8996;--green:#37d6a0;--gold:#f1c75b;--red:#ff6b7a}
+*{box-sizing:border-box}html,body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Noto Sans KR",sans-serif}
+button{font:inherit}body{padding-bottom:70px}
+header{height:60px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 15px;position:sticky;top:0;background:#090d12f5;backdrop-filter:blur(14px);z-index:20}
+.logo{font-weight:900;font-size:19px}.live{font-size:10px;color:var(--green);font-weight:800}.dot{display:inline-block;width:7px;height:7px;background:var(--green);border-radius:50%;margin-right:4px}
+main{max-width:1000px;margin:auto;padding:12px 12px 18px}.page{display:none}.page.active{display:block}
+.section-title{font-size:21px;font-weight:900;margin:8px 2px 12px}.sub{color:var(--muted);font-size:11px;margin-top:-7px;margin-bottom:13px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:13px;margin-bottom:12px}
+.tabs{display:flex;gap:7px;overflow:auto;padding-bottom:3px}.tabs button{border:0;background:#151e27;color:#aab5c1;padding:9px 13px;border-radius:8px;white-space:nowrap}.tabs button.active{background:#254137;color:#fff}
+.hero{display:flex;align-items:flex-end;justify-content:space-between}.symbol{font-size:23px;font-weight:950}.company{font-size:11px;color:var(--muted)}.score{font-size:28px;font-weight:950;color:var(--gold)}
+.chart-wrap{height:500px;margin-top:10px;border-radius:10px;overflow:hidden;background:#0b1117}.tvbox{height:100%;width:100%}.tvbox iframe{width:100%!important;height:100%!important}
+.note{font-size:10px;color:var(--muted);line-height:1.5;margin-top:7px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.metric{display:flex;justify-content:space-between;border-bottom:1px solid var(--line);padding:10px 0;font-size:12px}.metric:last-child{border:0}.green{color:var(--green)}.gold{color:var(--gold)}.red{color:var(--red)}
+.stock-row,.manager-row{display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--line);padding:12px 0}.stock-row:last-child,.manager-row:last-child{border:0}.rank{width:24px;color:var(--muted);font-size:11px}.stock-main{flex:1}.stock-symbol{font-weight:900}.stock-name{font-size:10px;color:var(--muted)}.stock-score{font-weight:900;color:var(--gold)}
+.icon-btn{border:1px solid var(--line);background:#151d26;color:#cbd4dd;border-radius:8px;width:34px;height:34px}.star.on{color:var(--gold)}
+.manager-badge{font-size:10px;color:var(--gold);border:1px solid #5b4d26;border-radius:5px;padding:3px 6px}
+.empty{color:var(--muted);font-size:12px;text-align:center;padding:25px 5px}
+.bottom{position:fixed;left:0;right:0;bottom:0;height:67px;background:#10161df7;border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(4,1fr);z-index:30;backdrop-filter:blur(15px)}
+.nav{border:0;background:none;color:#71808f;font-size:10px}.nav .ico{font-size:20px;display:block;line-height:23px}.nav.active{color:var(--green)}
+.setting{display:flex;align-items:center;justify-content:space-between;padding:13px 0;border-bottom:1px solid var(--line);font-size:13px}.setting:last-child{border:0}.switch{width:46px;height:26px;border-radius:15px;background:#27313b;padding:3px;border:0}.switch:after{content:"";display:block;width:20px;height:20px;background:#8793a0;border-radius:50%;transition:.2s}.switch.on{background:#1e7359}.switch.on:after{transform:translateX(20px);background:white}
+.toast{position:fixed;left:50%;bottom:82px;transform:translateX(-50%) translateY(20px);background:#202a34;color:#fff;padding:10px 14px;border-radius:9px;font-size:11px;opacity:0;pointer-events:none;transition:.2s;z-index:50}.toast.show{opacity:1;transform:translateX(-50%)}
+@media(max-width:650px){.grid{grid-template-columns:1fr}.chart-wrap{height:430px}}
+</style>
+</head>
+<body>
+<header><div class="logo">🐋 Whale <span style="color:var(--green)">13F</span></div><div class="live"><span class="dot"></span>LIVE</div></header>
+
+<main>
+<!-- HOME -->
+<section id="home" class="page active">
+<div class="section-title">오늘의 거장 레이더</div>
+<div class="sub" id="updated">데이터 확인 중…</div>
+<div class="card">
+  <div class="hero"><div><div class="symbol">🔥 TOP 5</div><div class="company">거장 신호 + 퀄리티를 함께 보는 관심목록</div></div><div class="score">92</div></div>
+</div>
+<div class="card"><div id="topStocks"></div></div>
+<div class="grid">
+ <div class="card"><div class="section-title" style="font-size:15px">🐋 거장 신호</div><div class="metric"><span>신뢰도 A급</span><b class="green">6명</b></div><div class="metric"><span>최근 13F 확인</span><b id="filingCount">—</b></div><div class="metric"><span>업데이트</span><b class="green">자동</b></div></div>
+ <div class="card"><div class="section-title" style="font-size:15px">🎯 Whale Score</div><div class="metric"><span>공통관심</span><b class="gold">94</b></div><div class="metric"><span>퀄리티</span><b class="gold">92</b></div><div class="metric"><span>성장</span><b class="gold">90</b></div></div>
+</div>
+</section>
+
+<!-- WHALES -->
+<section id="whales" class="page">
+<div class="section-title">🐋 거장</div><div class="sub">신뢰도 높은 13F 보유자 · 최근 제출일</div>
+<div class="card" id="managerList"><div class="empty">불러오는 중…</div></div>
+</section>
+
+<!-- WATCH -->
+<section id="watch" class="page">
+<div class="section-title">⭐ 관심</div><div class="sub">종목을 누르면 차트로 이동합니다. 별을 누르면 저장됩니다.</div>
+<div class="card" id="watchList"></div>
+</section>
+
+<!-- DETAIL -->
+<section id="detail" class="page">
+<div class="tabs" id="symbolTabs"></div>
+<div class="card">
+ <div class="hero"><div><div class="symbol" id="detailSymbol">AMZN</div><div class="company" id="detailName">Amazon</div></div><div class="score" id="detailScore">89</div></div>
+ <div class="chart-wrap"><div id="tvchart" class="tvbox"></div></div>
+ <div class="note">TradingView Advanced Chart. 종목/시장에 따라 실시간 또는 지연 데이터가 적용될 수 있습니다.</div>
+</div>
+<div class="grid">
+ <div class="card"><div class="section-title" style="font-size:15px">거장 신호</div><div class="metric"><span>공통 관심</span><b class="green">높음</b></div><div class="metric"><span>장기 보유 적합성</span><b class="green">높음</b></div><div class="metric"><span>변동성</span><b>중간</b></div></div>
+ <div class="card"><div class="section-title" style="font-size:15px">분석 요약</div><div id="detailReason" class="sub" style="line-height:1.7;margin:0">성장성과 현금흐름을 함께 보는 종목입니다.</div></div>
+</div>
+</section>
+
+<!-- SETTINGS -->
+<section id="settings" class="page">
+<div class="section-title">⚙ 설정</div><div class="sub">앱 표시와 자동 업데이트</div>
+<div class="card">
+ <div class="setting"><span>자동 업데이트</span><button class="switch on" data-setting="auto"></button></div>
+ <div class="setting"><span>거장 알림</span><button class="switch" data-setting="alert"></button></div>
+ <div class="setting"><span>다크 모드</span><button class="switch on" data-setting="dark"></button></div>
+ <div class="setting"><span>차트 기본 5분봉</span><button class="switch on" data-setting="5m"></button></div>
+</div>
+<div class="card"><div class="section-title" style="font-size:15px">데이터</div>
+ <div class="metric"><span>마지막 확인</span><b id="settingsUpdated">—</b></div>
+ <div class="metric"><span>다음 자동 확인</span><b class="green">10분 후</b></div>
+ <button id="refresh" style="width:100%;padding:12px;border:1px solid var(--line);border-radius:8px;background:#17212b;color:#fff">지금 업데이트</button>
+</div>
+</section>
+</main>
+
+<nav class="bottom">
+<button class="nav active" data-page="home"><span class="ico">⌂</span>홈</button>
+<button class="nav" data-page="whales"><span class="ico">🐋</span>거장</button>
+<button class="nav" data-page="watch"><span class="ico">★</span>관심</button>
+<button class="nav" data-page="settings"><span class="ico">⚙</span>설정</button>
+</nav>
+<div id="toast" class="toast"></div>
+
 <script>
-const stocks={AMZN:["Amazon","★★★★★","92"],GOOGL:["Alphabet","★★★★★","89"],MSFT:["Microsoft","★★★★☆","86"],TSM:["TSMC","★★★★☆","81"],DHR:["Danaher","★★★★☆","79"]};
-const sig={AMZN:["거장 공통 관심","성장성","현금흐름"],GOOGL:["거장 공통 관심","AI / 광고","밸류에이션"],MSFT:["공통 관심","AI / Cloud","퀄리티"],TSM:["AI 반도체","거장 관심","지정학 리스크"],DHR:["분산 매력","생명과학","방어력"]};
-const top=[["GOOGL","강력","거장 공통 관심"],["DHR","높음","분산 매력"],["MSFT","높음","퀄리티"],["META","관심","의견 분열"],["AMZN","관심","성장성"]];
+const stocks=[
+ {symbol:"GOOGL",name:"Alphabet",score:94,reason:"퀄리티 + 현금흐름 + AI"},
+ {symbol:"DHR",name:"Danaher",score:91,reason:"장기 복리 + 헬스케어"},
+ {symbol:"MSFT",name:"Microsoft",score:90,reason:"AI + 클라우드 + 해자"},
+ {symbol:"AMZN",name:"Amazon",score:89,reason:"클라우드 + 광고 + 성장"},
+ {symbol:"META",name:"Meta Platforms",score:87,reason:"광고 효율 + AI"}
+];
+let managers=[];
+let favorites=JSON.parse(localStorage.getItem("whaleFavorites")||'["GOOGL","DHR","MSFT"]');
+let settings=JSON.parse(localStorage.getItem("whaleSettings")||'{"auto":true,"alert":false,"dark":true,"5m":true}');
 let current="AMZN";
-function tv(s){let c=document.getElementById("tvchart");c.innerHTML="";let x=document.createElement("script");x.src="https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js";x.async=true;x.innerHTML=JSON.stringify({autosize:true,symbol:"NASDAQ:"+s,interval:"5",timezone:"Asia/Seoul",theme:"dark",style:"1",locale:"kr",enable_publishing:false,allow_symbol_change:false,hide_top_toolbar:false,hide_legend:false,hide_side_toolbar:false,withdateranges:true,save_image:false,support_host:"https://www.tradingview.com"});c.appendChild(x)}
-function load(s){current=s;document.getElementById("ticker").textContent=s;document.getElementById("name").textContent=stocks[s][0];document.getElementById("signals").innerHTML=sig[s].map(x=>`<div class="row"><span>${x}</span><span class="g">✓</span></div>`).join("");document.getElementById("score").innerHTML=`<div class="stars">${stocks[s][1]}</div><div class="row"><span>Whale Score</span><b class="gold">${stocks[s][2]}/100</b></div>`;tv(s)}
-Object.keys(stocks).forEach((s,i)=>{let b=document.createElement("button");b.textContent=s;b.onclick=()=>{document.querySelectorAll("#tabs button").forEach(x=>x.classList.remove("on"));b.classList.add("on");load(s)};if(!i)b.classList.add("on");document.getElementById("tabs").appendChild(b)});
-document.getElementById("top").innerHTML=top.map(x=>`<div class="row"><b>${x[0]}</b><span class="g">${x[1]}</span><span class="muted">${x[2]}</span></div>`).join("");
-async function sec(){try{let j=await(await fetch("/api/13f/recent")).json();document.getElementById("sec").innerHTML=j.filings.map(f=>`<div class="row"><span>${f.manager}</span><span class="muted">${f.filing_date||"—"}</span></div>`).join("")}catch(e){document.getElementById("sec").textContent="SEC 연결 실패"}}
-load(current);sec();setInterval(sec,3600000);
-</script></body></html>
+
+function toast(t){const x=document.getElementById("toast");x.textContent=t;x.classList.add("show");setTimeout(()=>x.classList.remove("show"),1800)}
+function save(){localStorage.setItem("whaleFavorites",JSON.stringify(favorites))}
+function nav(page){
+ document.querySelectorAll(".page").forEach(x=>x.classList.remove("active"));
+ document.getElementById(page).classList.add("active");
+ document.querySelectorAll(".nav").forEach(x=>x.classList.toggle("active",x.dataset.page===page));
+ window.scrollTo(0,0);
+}
+document.querySelectorAll(".nav").forEach(b=>b.addEventListener("click",()=>nav(b.dataset.page)));
+
+function renderStocks(){
+ document.getElementById("topStocks").innerHTML=stocks.map((s,i)=>`
+ <div class="stock-row" data-open="${s.symbol}">
+  <div class="rank">${i+1}</div><div class="stock-main"><div class="stock-symbol">${s.symbol}</div><div class="stock-name">${s.name}</div></div>
+  <div class="stock-score">${s.score}</div><button class="icon-btn star ${favorites.includes(s.symbol)?"on":""}" data-star="${s.symbol}">★</button>
+ </div>`).join("");
+ document.getElementById("watchList").innerHTML=stocks.filter(s=>favorites.includes(s.symbol)).map(s=>`
+ <div class="stock-row" data-open="${s.symbol}"><div class="stock-main"><div class="stock-symbol">${s.symbol}</div><div class="stock-name">${s.name} · ${s.reason}</div></div><div class="stock-score">${s.score}</div><button class="icon-btn star on" data-star="${s.symbol}">★</button></div>`).join("") || '<div class="empty">아직 저장한 관심종목이 없습니다.</div>';
+ bindStockButtons();
+}
+function bindStockButtons(){
+ document.querySelectorAll("[data-open]").forEach(x=>x.onclick=e=>{
+   if(e.target.closest("[data-star]"))return;
+   openDetail(x.dataset.open);
+ });
+ document.querySelectorAll("[data-star]").forEach(x=>x.onclick=e=>{
+   e.stopPropagation(); const s=x.dataset.star;
+   favorites=favorites.includes(s)?favorites.filter(v=>v!==s):[...favorites,s]; save(); renderStocks(); toast(favorites.includes(s)?"관심종목에 추가했습니다.":"관심종목에서 삭제했습니다.");
+ });
+}
+function openDetail(symbol){
+ current=symbol; const s=stocks.find(x=>x.symbol===symbol)||stocks[0];
+ document.getElementById("detailSymbol").textContent=s.symbol;
+ document.getElementById("detailName").textContent=s.name;
+ document.getElementById("detailScore").textContent=s.score;
+ document.getElementById("detailReason").textContent=s.reason;
+ document.getElementById("symbolTabs").innerHTML=stocks.map(x=>`<button class="${x.symbol===symbol?"active":""}" data-detail="${x.symbol}">${x.symbol}</button>`).join("");
+ document.querySelectorAll("[data-detail]").forEach(b=>b.onclick=()=>openDetail(b.dataset.detail));
+ nav("detail"); loadTV(symbol);
+}
+function loadTV(symbol){
+ const box=document.getElementById("tvchart"); box.innerHTML="";
+ const holder=document.createElement("div"); holder.className="tradingview-widget-container"; holder.style="height:100%;width:100%";
+ const inner=document.createElement("div"); inner.className="tradingview-widget-container__widget"; inner.style="height:calc(100% - 32px);width:100%";
+ holder.appendChild(inner);
+ const credit=document.createElement("div"); credit.style="font-size:9px;text-align:center;color:#65717d;padding:2px"; credit.textContent="TradingView";
+ holder.appendChild(credit);
+ const script=document.createElement("script"); script.type="text/javascript"; script.src="https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js"; script.async=true;
+ script.textContent=JSON.stringify({
+  autosize:true,symbol:"NASDAQ:"+symbol,interval:settings["5m"]?"5":"D",timezone:"Asia/Seoul",theme:"dark",
+  style:"1",locale:"kr",enable_publishing:false,allow_symbol_change:true,hide_top_toolbar:false,
+  hide_legend:false,hide_side_toolbar:false,withdateranges:true,save_image:false,calendar:false,
+  support_host:"https://www.tradingview.com"
+ });
+ holder.appendChild(script); box.appendChild(holder);
+}
+function renderManagers(){
+ document.getElementById("managerList").innerHTML=managers.map((m,i)=>`
+ <div class="manager-row"><div class="rank">${i+1}</div><div style="flex:1"><div style="font-weight:900">${m.person}</div><div class="stock-name">${m.name} · 최근 ${m.filing_date||"확인중"}</div></div><span class="manager-badge">${m.tier}</span></div>`).join("");
+ document.getElementById("filingCount").textContent=managers.filter(x=>x.filing_date).length+"명";
+}
+function renderSettings(){
+ document.querySelectorAll("[data-setting]").forEach(b=>b.classList.toggle("on",!!settings[b.dataset.setting]));
+ document.getElementById("settingsUpdated").textContent=localStorage.getItem("lastUpdate")||"—";
+}
+document.querySelectorAll("[data-setting]").forEach(b=>b.onclick=()=>{
+ const k=b.dataset.setting; settings[k]=!settings[k]; localStorage.setItem("whaleSettings",JSON.stringify(settings)); renderSettings();
+ toast(settings[k]?"켜짐":"꺼짐");
+ if(k==="5m"&&document.getElementById("detail").classList.contains("active"))loadTV(current);
+});
+async function update(){
+ try{
+  const r=await fetch("/api/overview",{cache:"no-store"}); const d=await r.json(); managers=d.managers||[];
+  const now=new Date(); const txt=now.toLocaleString("ko-KR",{month:"numeric",day:"numeric",hour:"2-digit",minute:"2-digit"});
+  document.getElementById("updated").textContent="마지막 확인 "+txt;
+  localStorage.setItem("lastUpdate",txt); renderManagers(); renderSettings(); toast("데이터 업데이트 완료");
+ }catch(e){document.getElementById("updated").textContent="SEC 연결 지연 · 화면 데이터는 유지됩니다."}
+}
+document.getElementById("refresh").onclick=update;
+renderStocks();renderSettings();update();
+setInterval(()=>{if(settings.auto)update()},600000);
+</script>
+</body></html>
