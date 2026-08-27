@@ -15,7 +15,7 @@ MANAGERS={
 @app.get("/")
 def home(): return send_from_directory(BASE,"index.html")
 @app.get("/<path:name>")
-def static(name): return send_from_directory(BASE,name)
+def static_files(name): return send_from_directory(BASE,name)
 @app.get("/api/health")
 def health(): return jsonify(ok=True,time=datetime.datetime.now(datetime.timezone.utc).isoformat())
 @app.get("/api/13f/recent")
