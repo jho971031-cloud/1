@@ -1,0 +1,35 @@
+<!doctype html><html lang="ko"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#090d12"><link rel="manifest" href="/manifest.json"><title>🐋 Whale 13F</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#090d12;color:#eef2f7;font-family:-apple-system,BlinkMacSystemFont,"Noto Sans KR",sans-serif}
+header{height:58px;padding:0 15px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #202832}.logo{font-size:19px;font-weight:900}.g{color:#39d49f}.gold{color:#f3c95b}.muted{color:#778594;font-size:11px}
+main{max-width:1000px;margin:auto;padding:12px 12px 75px}.tabs{display:flex;gap:7px;overflow:auto;margin-bottom:10px}.tabs button{border:0;background:#131a22;color:#aab5c1;padding:9px 14px;border-radius:7px}.tabs .on{background:#24302c;color:#fff}
+.card{background:#0f151c;border:1px solid #202832;border-radius:13px;padding:12px;margin-bottom:12px}.ticker{font-weight:900}.name{font-size:11px;color:#778594}.quote{display:flex;gap:10px;align-items:end}.price{font-size:30px;font-weight:900}
+.chart{height:500px;margin-top:10px;border-radius:9px;overflow:hidden;background:#0b1117}.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.h{font-size:14px;font-weight:850;margin-bottom:9px}.row{display:flex;justify-content:space-between;gap:7px;padding:9px 0;border-bottom:1px solid #202832;font-size:12px}.row:last-child{border:0}.stars{color:#f3c95b;font-size:16px}
+.bottom{position:fixed;bottom:0;left:0;right:0;height:60px;background:#10161cf2;border-top:1px solid #202832;display:flex;justify-content:space-around}.bottom button{border:0;background:none;color:#758392;font-size:10px}.bottom b{display:block;color:#eef2f7;font-size:17px}
+@media(max-width:650px){.grid{grid-template-columns:1fr}.chart{height:430px}}
+</style></head><body>
+<header><div class="logo">🐋 Whale <span class="g">13F</span></div><div class="g">● LIVE CHART</div></header>
+<main><div id="tabs" class="tabs"></div>
+<section class="card"><div class="ticker" id="ticker">AMZN</div><div class="name" id="name">Amazon</div>
+<div class="quote"><div class="price">TradingView</div><div class="g">실시간 차트</div></div>
+<div class="chart" id="tvchart"></div>
+<div class="muted">TradingView 차트 데이터 기준. 거래소/계정 권한에 따라 실시간 또는 지연 데이터일 수 있습니다.</div></section>
+<div class="grid"><section class="card"><div class="h">🐋 거장 신호</div><div id="signals"></div></section>
+<section class="card"><div class="h">🎯 Whale Score</div><div id="score"></div></section></div>
+<section class="card"><div class="h">🔥 관심종목 TOP 5</div><div id="top"></div></section>
+<section class="card"><div class="h">📡 SEC 최근 13F</div><div id="sec">불러오는 중…</div></section>
+</main><nav class="bottom"><button>⌂<br>홈</button><button>🐋<br>거장</button><button>★<br>관심</button><button>⚙<br>설정</button></nav>
+<script>
+const stocks={AMZN:["Amazon","★★★★★","92"],GOOGL:["Alphabet","★★★★★","89"],MSFT:["Microsoft","★★★★☆","86"],TSM:["TSMC","★★★★☆","81"],DHR:["Danaher","★★★★☆","79"]};
+const sig={AMZN:["거장 공통 관심","성장성","현금흐름"],GOOGL:["거장 공통 관심","AI / 광고","밸류에이션"],MSFT:["공통 관심","AI / Cloud","퀄리티"],TSM:["AI 반도체","거장 관심","지정학 리스크"],DHR:["분산 매력","생명과학","방어력"]};
+const top=[["GOOGL","강력","거장 공통 관심"],["DHR","높음","분산 매력"],["MSFT","높음","퀄리티"],["META","관심","의견 분열"],["AMZN","관심","성장성"]];
+let current="AMZN";
+function tv(s){let c=document.getElementById("tvchart");c.innerHTML="";let x=document.createElement("script");x.src="https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js";x.async=true;x.innerHTML=JSON.stringify({autosize:true,symbol:"NASDAQ:"+s,interval:"5",timezone:"Asia/Seoul",theme:"dark",style:"1",locale:"kr",enable_publishing:false,allow_symbol_change:false,hide_top_toolbar:false,hide_legend:false,hide_side_toolbar:false,withdateranges:true,save_image:false,support_host:"https://www.tradingview.com"});c.appendChild(x)}
+function load(s){current=s;document.getElementById("ticker").textContent=s;document.getElementById("name").textContent=stocks[s][0];document.getElementById("signals").innerHTML=sig[s].map(x=>`<div class="row"><span>${x}</span><span class="g">✓</span></div>`).join("");document.getElementById("score").innerHTML=`<div class="stars">${stocks[s][1]}</div><div class="row"><span>Whale Score</span><b class="gold">${stocks[s][2]}/100</b></div>`;tv(s)}
+Object.keys(stocks).forEach((s,i)=>{let b=document.createElement("button");b.textContent=s;b.onclick=()=>{document.querySelectorAll("#tabs button").forEach(x=>x.classList.remove("on"));b.classList.add("on");load(s)};if(!i)b.classList.add("on");document.getElementById("tabs").appendChild(b)});
+document.getElementById("top").innerHTML=top.map(x=>`<div class="row"><b>${x[0]}</b><span class="g">${x[1]}</span><span class="muted">${x[2]}</span></div>`).join("");
+async function sec(){try{let j=await(await fetch("/api/13f/recent")).json();document.getElementById("sec").innerHTML=j.filings.map(f=>`<div class="row"><span>${f.manager}</span><span class="muted">${f.filing_date||"—"}</span></div>`).join("")}catch(e){document.getElementById("sec").textContent="SEC 연결 실패"}}
+load(current);sec();setInterval(sec,3600000);
+</script></body></html>
